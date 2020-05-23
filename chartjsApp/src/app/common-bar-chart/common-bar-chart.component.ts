@@ -5,9 +5,11 @@ import {
   lableShowValueMin,
   ChartJSUtils,
   CJChartDataSet,
+  replaceAllStrings,
 } from 'src/chartjs-utils/chart-js-utils';
 
 declare var Chart;
+declare var ChartDataLabels;
 @Component({
   selector: 'app-common-bar-chart',
   templateUrl: './common-bar-chart.component.html',
@@ -53,13 +55,13 @@ export class CommonBarChartComponent implements OnInit {
         data: dataset.data,
       });
 
-      console.log(i);
       i++;
     });
 
     let elmnt: any = <HTMLCanvasElement>document.getElementById(this.chartId);
     let ctx: any = elmnt.getContext('2d');
     let myBar = new Chart(ctx, {
+      plugins: [ChartDataLabels],
       type: 'horizontalBar',
       data: barChartData,
       options: {
@@ -104,7 +106,11 @@ export class CommonBarChartComponent implements OnInit {
             formatter: function (value, ctx) {
               let str = '';
               if (withLables && lableShowValueMin <= value) {
-                str += ctx.dataset.label + '- ';
+                let filterlabel = replaceAllStrings(ctx.dataset.label, '%', '');
+                filterlabel = replaceAllStrings(filterlabel, '(', '');
+                filterlabel = replaceAllStrings(filterlabel, ')', '');
+
+                str += filterlabel + '- ';
               }
               str += value + '%';
               return str;

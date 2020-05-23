@@ -2,6 +2,7 @@ export const withLables = true;
 export const lableShowValueMin = 5;
 export const toolTipShowMinValue = 2;
 export const maxToolTipItemsCount = 5;
+export const excludeDatasetWithValueSumMin = 55;
 export const tooltipLableValueSep = ':';
 export const tooltipValueEndSufix = '%';
 export const graphXAsixMaxValue = 100;
@@ -10,6 +11,10 @@ export interface CJChartDataSet {
   label: string;
   data: any[];
 }
+export const replaceAllStrings = (input: string, match: string, to: string) => {
+  return input.split(match).join(to);
+};
+
 export class ChartJSUtils {
   static randomNumber = (max: number = 20) => {
     var v = Math.round(Math.random() * max);
@@ -74,7 +79,11 @@ export class ChartJSUtils {
 
         let bodyValue = body[0];
         let bodyParts = bodyValue.split(tooltipLableValueSep);
-        let firstPart = bodyParts.slice(0, bodyParts.length - 1);
+        let firstPart = bodyParts
+          .slice(0, bodyParts.length - 1)
+          .map((v) => ('' + v).trim())
+          .join('');
+
         let valueOnly = bodyParts
           .slice(bodyParts.length - 1, bodyParts.length)
           .map((v) => ('' + v).trim())
@@ -82,13 +91,26 @@ export class ChartJSUtils {
           .split(tooltipValueEndSufix)
           .join('')
           .trim();
+
+        firstPart = replaceAllStrings(firstPart, '%', '');
+        firstPart = replaceAllStrings(firstPart, '(', '');
+        firstPart = replaceAllStrings(firstPart, ')', '');
+
         // console.log([firstPart, +valueOnly]);
         if (
           valueOnly >= toolTipShowMinValue &&
           bodyData.length < maxToolTipItemsCount
         ) {
           bodyData.push({
-            html: '<tr><td>' + span + body + '</td></tr>',
+            html:
+              '<tr><td>' +
+              span +
+              firstPart +
+              tooltipLableValueSep +
+              ' ' +
+              valueOnly +
+              tooltipValueEndSufix +
+              ' </td></tr>',
             value: valueOnly,
           });
         }

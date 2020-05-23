@@ -5,9 +5,12 @@ import {
   lableShowValueMin,
   ChartJSUtils,
   CJChartDataSet,
+  replaceAllStrings,
+  excludeDatasetWithValueSumMin,
 } from 'src/chartjs-utils/chart-js-utils';
 
 declare var Chart;
+declare var ChartDataLabels;
 @Component({
   selector: 'app-common-stacked-chart',
   templateUrl: './common-stacked-chart.component.html',
@@ -37,8 +40,16 @@ export class CommonStackedChartComponent implements OnInit {
       labels: this.labels,
       datasets: [],
     };
+    let i = 0;
+    this.datasets.forEach((dataset) => {
+      var valueSum = dataset.data.reduce(function (a, b) {
+        console.log(b);
+        return a + b;
+      }, 0);
+      if (excludeDatasetWithValueSumMin >= valueSum) {
+        return;
+      }
 
-    this.datasets.forEach((dataset, i) => {
       barChartData.datasets.push({
         label: dataset.label,
         backgroundColor: this.color(ChartJSUtils.Colors[i])
@@ -48,11 +59,13 @@ export class CommonStackedChartComponent implements OnInit {
         borderWidth: 1,
         data: dataset.data,
       });
+      i++;
     });
 
     let elmnt: any = <HTMLCanvasElement>document.getElementById(this.chartId);
     let ctx: any = elmnt.getContext('2d');
     let myBar = new Chart(ctx, {
+      plugins: [ChartDataLabels],
       type: 'horizontalBar',
       data: barChartData,
       options: {
@@ -71,9 +84,6 @@ export class CommonStackedChartComponent implements OnInit {
             },
           ],
           xAxes: [
-            // {
-            //   stacked: true,
-            // },
             {
               stacked: true,
               ticks: {
@@ -100,14 +110,18 @@ export class CommonStackedChartComponent implements OnInit {
             formatter: function (value, ctx) {
               let str = '';
               if (withLables && lableShowValueMin <= value) {
-                str += ctx.dataset.label + '- ';
+                let filterlabel = replaceAllStrings(ctx.dataset.label, '%', '');
+                filterlabel = replaceAllStrings(filterlabel, '(', '');
+                filterlabel = replaceAllStrings(filterlabel, ')', '');
+
+                str += filterlabel + '- ';
               }
               str += value + '%';
               return str;
             },
             display: function (ctx) {
               if (ctx.active) {
-                console.log(ctx.dataset.label);
+                // console.log(ctx.dataset.label);
               }
               return ctx.dataset.data[ctx.dataIndex] > 0;
             },
