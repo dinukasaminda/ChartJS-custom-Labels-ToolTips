@@ -14,7 +14,8 @@ declare var Chart;
   styleUrls: ['./common-bar-chart.component.scss'],
 })
 export class CommonBarChartComponent implements OnInit {
-  @Input() chartId: string = 'canvas' + Date.now();
+  @Input() chartId: string =
+    'canvas' + Date.now() + '' + ChartJSUtils.randomNumber(100000);
   @Input() title: string = 'Chart.js Bar Chart';
 
   @Input() labels: string[] = [];

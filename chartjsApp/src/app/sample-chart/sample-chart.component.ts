@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { ChartJSUtils } from 'src/chartjs-utils/chart-js-utils';
 
 declare var Chart;
 declare var chartColors;
@@ -8,7 +9,8 @@ declare var chartColors;
   styleUrls: ['./sample-chart.component.scss'],
 })
 export class SampleChartComponent implements OnInit {
-  @Input() chartId: string = 'canvas' + Date.now();
+  @Input() chartId: string =
+    'canvas' + Date.now() + '' + ChartJSUtils.randomNumber(100000);
   MONTHS = [
     'January',
     'February',

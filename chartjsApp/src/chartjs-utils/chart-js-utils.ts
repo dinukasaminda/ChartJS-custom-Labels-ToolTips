@@ -11,8 +11,8 @@ export interface CJChartDataSet {
   data: any[];
 }
 export class ChartJSUtils {
-  static randomNumber = () => {
-    var v = Math.round(Math.random() * 20);
+  static randomNumber = (max: number = 20) => {
+    var v = Math.round(Math.random() * max);
     return v;
   };
 
