@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Stacked Bar Chart</title>
+    <script src="./chart2.8.js"></script>
+    <script src="https://www.chartjs.org/samples/latest/utils.js"></script>
+    <script src="./chartjs-plugin-datalabels.js"></script>
+    <style>
+      canvas {
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+      }
+      #chartjs-tooltip {
+        background: #fefefe;
+
+        border-radius: 2px;
+        border: 2px solid black;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div style="width: 75%;">
+      <canvas id="canvas"></canvas>
+    </div>
+    <button id="randomizeData">Randomize Data</button>
+    <script>
+      const randomScalingFactor1 = () => {
+        var v = Math.round(Math.random() * 100);
+        return v;
+      };
+      var withLables = true;
+      var lableShowValueMin = 15;
+      var toolTipShowMinValue = 15;
+      var maxToolTipItemsCount = 20;
+      var tooltipLableValueSep = ":";
+      var tooltipValueEndSufix = "%";
+      var graphXAsixMaxValue = 1000;
+      var toolTopSortOrder = "dec"; //default,asc,dec
+      var barChartData = {
+        labels: ["January", "February", "July"],
+        datasets: [
+          {
+            label: "Dataset 1",
+            backgroundColor: window.chartColors.red,
+            data: [
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+            ],
+          },
+
+          {
+            label: "Dataset 2",
+            backgroundColor: window.chartColors.blue,
+            data: [
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+            ],
+          },
+          {
+            label: "Dataset 3",
+            backgroundColor: window.chartColors.green,
+            data: [
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+            ],
+          },
+          {
+            label: "Dataset 4",
+            backgroundColor: window.chartColors.orange,
+            data: [
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+              randomScalingFactor1(),
+            ],
+          },
+        ],
+      };
+      window.onload = function () {
+        var ctx = document.getElementById("canvas").getContext("2d");
+        window.myBar = new Chart(ctx, {
+          type: "horizontalBar",
+          data: barChartData,
+          options: {
+            title: {
+              display: true,
+              text: "Chart.js Bar Chart - Stacked",
+            },
+            tooltips: {
+              mode: "index",
+              intersect: false,
+              enabled: false,
+
+              custom: function (tooltipModel) {
+                // Tooltip Element
+                var tooltipEl = document.getElementById("chartjs-tooltip");
+
+                // Create element on first render
+                if (!tooltipEl) {
+                  tooltipEl = document.createElement("div");
+                  tooltipEl.id = "chartjs-tooltip";
+                  tooltipEl.innerHTML = "<table></table>";
+                  document.body.appendChild(tooltipEl);
+                }
+
+                // Hide if no tooltip
+                if (tooltipModel.opacity === 0) {
+                  tooltipEl.style.opacity = 0;
+                  return;
+                }
+
+                // Set caret Position
+                tooltipEl.classList.remove("above", "below", "no-transform");
+                if (tooltipModel.yAlign) {
+                  tooltipEl.classList.add(tooltipModel.yAlign);
+                } else {
+                  tooltipEl.classList.add("no-transform");
+                }
+
+                function getBody(bodyItem) {
+                  return bodyItem.lines;
+                }
+
+                // Set Text
+                if (tooltipModel.body) {
+                  var titleLines = tooltipModel.title || [];
+                  var bodyLines = tooltipModel.body.map(getBody);
+
+                  var innerHtml = "<thead>";
+
+                  titleLines.forEach(function (title) {
+                    innerHtml += "<tr><th>" + title + "</th></tr>";
+                  });
+                  innerHtml += "</thead><tbody>";
+
+                  let bodyData = [];
+
+                  bodyLines.forEach(function (body, i) {
+                    var colors = tooltipModel.labelColors[i];
+                    var style = "background:" + colors.backgroundColor;
+                    style += "; border-color:" + colors.borderColor;
+                    style += "; border-width: 2px";
+                    var span = '<span style="' + style + '"></span>';
+
+                    let bodyValue = body[0];
+                    let bodyParts = bodyValue.split(tooltipLableValueSep);
+                    let firstPart = bodyParts.slice(0, bodyParts.length - 1);
+                    let valueOnly = bodyParts
+                      .slice(bodyParts.length - 1, bodyParts.length)
+                      .map((v) => ("" + v).trim())
+                      .join("")
+                      .split(tooltipValueEndSufix)
+                      .join("")
+                      .trim();
+                    console.log([firstPart, +valueOnly]);
+                    if (
+                      valueOnly >= toolTipShowMinValue &&
+                      bodyData.length < maxToolTipItemsCount
+                    ) {
+                      bodyData.push({
+                        html: "<tr><td>" + span + body + "</td></tr>",
+                        value: valueOnly,
+                      });
+                    }
+                  });
+                  if (toolTopSortOrder != "default") {
+                    if (toolTopSortOrder == "asc") {
+                      bodyData = bodyData.sort((a, b) => a.value - b.value);
+                    } else {
+                      bodyData = bodyData.sort((a, b) => b.value - a.value);
+                    }
+                  }
+
+                  bodyData.forEach((item) => {
+                    innerHtml += item.html;
+                  });
+                  innerHtml += "</tbody>";
+
+                  var tableRoot = tooltipEl.querySelector("table");
+                  tableRoot.innerHTML = innerHtml;
+                }
+
+                // `this` will be the overall tooltip
+                var position = this._chart.canvas.getBoundingClientRect();
+
+                // Display, position, and set styles for font
+                tooltipEl.style.opacity = 1;
+                tooltipEl.style.position = "absolute";
+                tooltipEl.style.left =
+                  position.left +
+                  window.pageXOffset +
+                  tooltipModel.caretX +
+                  "px";
+                tooltipEl.style.top =
+                  position.top +
+                  window.pageYOffset +
+                  tooltipModel.caretY +
+                  "px";
+                tooltipEl.style.fontFamily = tooltipModel._bodyFontFamily;
+                tooltipEl.style.fontSize = tooltipModel.bodyFontSize + "px";
+                tooltipEl.style.fontStyle = tooltipModel._bodyFontStyle;
+                tooltipEl.style.padding =
+                  tooltipModel.yPadding + "px " + tooltipModel.xPadding + "px";
+                tooltipEl.style.pointerEvents = "none";
+              },
+            },
+            responsive: true,
+            scales: {
+              yAxes: [
+                {
+                  stacked: true,
+                },
+              ],
+              xAxes: [
+                // {
+                //   stacked: true,
+                // },
+                {
+                  stacked: true,
+                  ticks: {
+                    callback: function (value, index, values) {
+                      return value + "%";
+                    },
+                    max: graphXAsixMaxValue,
+                  },
+                },
+              ],
+            },
+            plugins: {
+              datalabels: {
+                color: "#000000",
+                formatter: function (value, ctx) {
+                  let str = "";
+                  if (withLables && lableShowValueMin <= value) {
+                    str += ctx.dataset.label + "- ";
+                  }
+                  str += value + "%";
+                  return str;
+                },
+                display: function (ctx) {
+                  if (ctx.active) {
+                    console.log(ctx.dataset.label);
+                  }
+                  return ctx.dataset.data[ctx.dataIndex] > 0;
+                },
+                font: { weight: "bold" },
+                offset: 0,
+                padding: 0,
+              },
+            },
+          },
+        });
+      };
+
+      document
+        .getElementById("randomizeData")
+        .addEventListener("click", function () {
+          barChartData.datasets.forEach(function (dataset) {
+            dataset.data = dataset.data.map(function () {
+              return randomScalingFactor1();
+            });
+          });
+          window.myBar.update();
+        });
+
+      //         trancateText(str,maxLen){
+
+      //             if(str.length>maxLen){
+      // return str.subString(0,maxLen);
+      //             }else{
+      //                 return str;
+      //             }
+      //         }
+    </script>
+  </body>
+</html>
