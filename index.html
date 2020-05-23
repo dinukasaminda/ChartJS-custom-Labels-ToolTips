@@ -3,7 +3,7 @@
   <head>
     <title>Stacked Bar Chart</title>
     <script src="./chart2.8.js"></script>
-    <script src="https://www.chartjs.org/samples/latest/utils.js"></script>
+    <script src="./utils.js"></script>
     <script src="./chartjs-plugin-datalabels.js"></script>
     <style>
       canvas {
@@ -27,7 +27,7 @@
     <button id="randomizeData">Randomize Data</button>
     <script>
       const randomScalingFactor1 = () => {
-        var v = Math.round(Math.random() * 100);
+        var v = Math.round(Math.random() * 100) - 25;
         return v;
       };
       var withLables = true;

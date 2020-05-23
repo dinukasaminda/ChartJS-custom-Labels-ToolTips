@@ -11,6 +11,123 @@ export interface CJChartDataSet {
   data: any[];
 }
 export class ChartJSUtils {
+  static randomNumber = () => {
+    var v = Math.round(Math.random() * 20);
+    return v;
+  };
+
+  static customToolTip = (
+    document: any,
+    tooltipModel: any,
+    toolTopSortOrder: string,
+    _: any
+  ) => {
+    // Tooltip Element
+    var tooltipEl = document.getElementById('chartjs-tooltip');
+
+    // Create element on first render
+    if (!tooltipEl) {
+      tooltipEl = document.createElement('div');
+      tooltipEl.id = 'chartjs-tooltip';
+      tooltipEl.innerHTML = '<table></table>';
+      document.body.appendChild(tooltipEl);
+    }
+
+    // Hide if no tooltip
+    if (tooltipModel.opacity === 0) {
+      tooltipEl.style.opacity = '0';
+      return;
+    }
+
+    // Set caret Position
+    tooltipEl.classList.remove('above', 'below', 'no-transform');
+    if (tooltipModel.yAlign) {
+      tooltipEl.classList.add(tooltipModel.yAlign);
+    } else {
+      tooltipEl.classList.add('no-transform');
+    }
+
+    function getBody(bodyItem) {
+      return bodyItem.lines;
+    }
+
+    // Set Text
+    if (tooltipModel.body) {
+      var titleLines = tooltipModel.title || [];
+      var bodyLines = tooltipModel.body.map(getBody);
+
+      var innerHtml = '<thead>';
+
+      titleLines.forEach(function (title) {
+        innerHtml += '<tr><th>' + title + '</th></tr>';
+      });
+      innerHtml += '</thead><tbody>';
+
+      let bodyData = [];
+
+      bodyLines.forEach(function (body, i) {
+        var colors = tooltipModel.labelColors[i];
+        var style = 'background:' + colors.backgroundColor;
+        style += '; border-color:' + colors.borderColor;
+        style += '; border-width: 2px';
+        var span = '<span style="' + style + '"></span>';
+
+        let bodyValue = body[0];
+        let bodyParts = bodyValue.split(tooltipLableValueSep);
+        let firstPart = bodyParts.slice(0, bodyParts.length - 1);
+        let valueOnly = bodyParts
+          .slice(bodyParts.length - 1, bodyParts.length)
+          .map((v) => ('' + v).trim())
+          .join('')
+          .split(tooltipValueEndSufix)
+          .join('')
+          .trim();
+        // console.log([firstPart, +valueOnly]);
+        if (
+          valueOnly >= toolTipShowMinValue &&
+          bodyData.length < maxToolTipItemsCount
+        ) {
+          bodyData.push({
+            html: '<tr><td>' + span + body + '</td></tr>',
+            value: valueOnly,
+          });
+        }
+      });
+      if (toolTopSortOrder != 'default') {
+        if (toolTopSortOrder == 'asc') {
+          bodyData = bodyData.sort((a, b) => a.value - b.value);
+        } else {
+          bodyData = bodyData.sort((a, b) => b.value - a.value);
+        }
+      }
+
+      bodyData.forEach((item) => {
+        innerHtml += item.html;
+      });
+      innerHtml += '</tbody>';
+
+      var tableRoot = tooltipEl.querySelector('table');
+      tableRoot.innerHTML = innerHtml;
+    }
+
+    // `this` will be the overall tooltip
+    var position = _._chart.canvas.getBoundingClientRect();
+
+    // Display, position, and set styles for font
+    tooltipEl.style.opacity = '1';
+    tooltipEl.style.position = 'absolute';
+    tooltipEl.style.left =
+      position.left + window.pageXOffset + tooltipModel.caretX + 'px';
+    tooltipEl.style.top =
+      position.top + window.pageYOffset + tooltipModel.caretY + 'px';
+    tooltipEl.style.fontFamily = tooltipModel._bodyFontFamily;
+    tooltipEl.style.fontSize = tooltipModel.bodyFontSize + 'px';
+    tooltipEl.style.fontStyle = tooltipModel._bodyFontStyle;
+    tooltipEl.style.padding =
+      tooltipModel.yPadding + 'px ' + tooltipModel.xPadding + 'px';
+    tooltipEl.style.pointerEvents = 'none';
+  };
+
   static Colors = [
     '#FFCA28',
     '#C5CAE9',
@@ -270,121 +387,4 @@ export class ChartJSUtils {
     '#263238',
     '#000000',
   ];
-
-  static randomNumber = () => {
-    var v = Math.round(Math.random() * 20);
-    return v;
-  };
-
-  static customToolTip = (
-    document: any,
-    tooltipModel: any,
-    toolTopSortOrder: string,
-    _: any
-  ) => {
-    // Tooltip Element
-    var tooltipEl = document.getElementById('chartjs-tooltip');
-
-    // Create element on first render
-    if (!tooltipEl) {
-      tooltipEl = document.createElement('div');
-      tooltipEl.id = 'chartjs-tooltip';
-      tooltipEl.innerHTML = '<table></table>';
-      document.body.appendChild(tooltipEl);
-    }
-
-    // Hide if no tooltip
-    if (tooltipModel.opacity === 0) {
-      tooltipEl.style.opacity = '0';
-      return;
-    }
-
-    // Set caret Position
-    tooltipEl.classList.remove('above', 'below', 'no-transform');
-    if (tooltipModel.yAlign) {
-      tooltipEl.classList.add(tooltipModel.yAlign);
-    } else {
-      tooltipEl.classList.add('no-transform');
-    }
-
-    function getBody(bodyItem) {
-      return bodyItem.lines;
-    }
-
-    // Set Text
-    if (tooltipModel.body) {
-      var titleLines = tooltipModel.title || [];
-      var bodyLines = tooltipModel.body.map(getBody);
-
-      var innerHtml = '<thead>';
-
-      titleLines.forEach(function (title) {
-        innerHtml += '<tr><th>' + title + '</th></tr>';
-      });
-      innerHtml += '</thead><tbody>';
-
-      let bodyData = [];
-
-      bodyLines.forEach(function (body, i) {
-        var colors = tooltipModel.labelColors[i];
-        var style = 'background:' + colors.backgroundColor;
-        style += '; border-color:' + colors.borderColor;
-        style += '; border-width: 2px';
-        var span = '<span style="' + style + '"></span>';
-
-        let bodyValue = body[0];
-        let bodyParts = bodyValue.split(tooltipLableValueSep);
-        let firstPart = bodyParts.slice(0, bodyParts.length - 1);
-        let valueOnly = bodyParts
-          .slice(bodyParts.length - 1, bodyParts.length)
-          .map((v) => ('' + v).trim())
-          .join('')
-          .split(tooltipValueEndSufix)
-          .join('')
-          .trim();
-        console.log([firstPart, +valueOnly]);
-        if (
-          valueOnly >= toolTipShowMinValue &&
-          bodyData.length < maxToolTipItemsCount
-        ) {
-          bodyData.push({
-            html: '<tr><td>' + span + body + '</td></tr>',
-            value: valueOnly,
-          });
-        }
-      });
-      if (toolTopSortOrder != 'default') {
-        if (toolTopSortOrder == 'asc') {
-          bodyData = bodyData.sort((a, b) => a.value - b.value);
-        } else {
-          bodyData = bodyData.sort((a, b) => b.value - a.value);
-        }
-      }
-
-      bodyData.forEach((item) => {
-        innerHtml += item.html;
-      });
-      innerHtml += '</tbody>';
-
-      var tableRoot = tooltipEl.querySelector('table');
-      tableRoot.innerHTML = innerHtml;
-    }
-
-    // `this` will be the overall tooltip
-    var position = _._chart.canvas.getBoundingClientRect();
-
-    // Display, position, and set styles for font
-    tooltipEl.style.opacity = '1';
-    tooltipEl.style.position = 'absolute';
-    tooltipEl.style.left =
-      position.left + window.pageXOffset + tooltipModel.caretX + 'px';
-    tooltipEl.style.top =
-      position.top + window.pageYOffset + tooltipModel.caretY + 'px';
-    tooltipEl.style.fontFamily = tooltipModel._bodyFontFamily;
-    tooltipEl.style.fontSize = tooltipModel.bodyFontSize + 'px';
-    tooltipEl.style.fontStyle = tooltipModel._bodyFontStyle;
-    tooltipEl.style.padding =
-      tooltipModel.yPadding + 'px ' + tooltipModel.xPadding + 'px';
-    tooltipEl.style.pointerEvents = 'none';
-  };
 }

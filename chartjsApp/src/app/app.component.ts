@@ -23,7 +23,6 @@ export class AppComponent {
         ChartJSUtils.randomNumber(),
       ],
     },
-
     {
       label: 'Dataset 2',
       data: [
@@ -52,6 +51,22 @@ export class AppComponent {
       label: 'Dataset 4',
       data: [
         ChartJSUtils.randomNumber(),
+        ChartJSUtils.randomNumber(),
+        ChartJSUtils.randomNumber(),
+        ChartJSUtils.randomNumber(),
+        ChartJSUtils.randomNumber(),
+        ChartJSUtils.randomNumber(),
+        ChartJSUtils.randomNumber(),
+      ],
+    },
+  ];
+
+  mylabels2 = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+  myTitle2 = 'Total Report';
+  myDataset2 = [
+    {
+      label: 'Dataset 1',
+      data: [
         ChartJSUtils.randomNumber(),
         ChartJSUtils.randomNumber(),
         ChartJSUtils.randomNumber(),
