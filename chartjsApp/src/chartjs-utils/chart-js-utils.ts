@@ -135,6 +135,12 @@ export class ChartJSUtils {
 
       bodyData.forEach((item) => {
         innerHtml += item.html;
+        bodyData.forEach((item) => {
+          innerHtml += item.html;
+          bodyData.forEach((item) => {
+            innerHtml += item.html;
+          });
+        });
       });
 
       innerHtml += '</tbody>';
@@ -158,7 +164,6 @@ export class ChartJSUtils {
     tooltipEl.style.fontStyle = tooltipModel._bodyFontStyle;
     tooltipEl.style.padding =
       tooltipModel.yPadding + 'px ' + tooltipModel.xPadding + 'px';
-    tooltipEl.style.pointerEvents = 'none';
   };
 
   static Colors = [
