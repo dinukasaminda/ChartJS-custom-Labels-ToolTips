@@ -135,12 +135,6 @@ export class ChartJSUtils {
 
       bodyData.forEach((item) => {
         innerHtml += item.html;
-        bodyData.forEach((item) => {
-          innerHtml += item.html;
-          bodyData.forEach((item) => {
-            innerHtml += item.html;
-          });
-        });
       });
 
       innerHtml += '</tbody>';
