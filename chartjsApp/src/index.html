@@ -16,16 +16,74 @@
 
       #chartjs-tooltip {
         background: #fefefe;
+        overflow-y: auto;
+        touch-action: auto;
 
         border-radius: 2px;
         border: 2px solid black;
+        max-height: 300px;
+        z-index: 9999999;
+        pointer-events: default !important;
       }
     </style>
   </head>
   <body>
     <app-root></app-root>
+
     <script src="./assets/chart-js-utils/chart2.8.js"></script>
     <script src="./assets/chart-js-utils/utils.js"></script>
     <script src="./assets/chart-js-utils/chartjs-plugin-datalabels.js"></script>
+    <script>
+      var chartJsToolTipMouseOver = false;
+      document.addEventListener("mousemove", (e) => {
+        let elm = document.getElementById("chartjs-tooltip");
+        if (elm == null) {
+          return;
+        }
+        let delx = 50;
+        let dely = 50;
+        var elmntProps = {
+          x: +elm.style.left.replace("px", ""),
+          y: +elm.style.top.replace("px", ""),
+          w: elm.offsetWidth,
+          h: elm.offsetHeight,
+        };
+        var mouseProps = {
+          x: e.pageX,
+          y: e.pageY,
+        };
+        if (
+          mouseProps.x >= elmntProps.x - delx &&
+          mouseProps.x <= elmntProps.x + elmntProps.w + delx &&
+          mouseProps.y >= elmntProps.y - dely &&
+          mouseProps.y <= elmntProps.y + elmntProps.h + dely
+        ) {
+          chartJsToolTipMouseOver = true;
+        } else {
+          chartJsToolTipMouseOver = false;
+        }
+        // console.log(elmntProps, mouseProps);
+      });
+
+      setInterval(() => {
+        try {
+          let elm = document.getElementById("chartjs-tooltip");
+          if (elm == null) {
+            return;
+          }
+
+          elm.style["pointer-events"] = "auto";
+          // elm.scrollTo(0, 200);
+          // elm.focus({ preventScroll: false });
+          // elm.focus((e) => {
+          //   console.log("ee", e);
+          //   //   e.preventDefault();
+          //   //   e.target.focus({ preventScroll: true });
+          // });
+        } catch (err) {
+          console.error(err);
+        }
+      }, 600);
+    </script>
   </body>
 </html>

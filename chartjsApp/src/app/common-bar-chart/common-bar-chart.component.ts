@@ -117,7 +117,7 @@ export class CommonBarChartComponent implements OnInit {
             },
             display: function (ctx) {
               if (ctx.active) {
-                console.log(ctx.dataset.label);
+                // console.log(ctx.dataset.label);
               }
               return ctx.dataset.data[ctx.dataIndex] > 0;
             },

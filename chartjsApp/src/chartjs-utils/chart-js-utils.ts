@@ -1,3 +1,4 @@
+declare var chartJsToolTipMouseOver: boolean;
 export const withLables = true;
 export const lableShowValueMin = 5;
 export const toolTipShowMinValue = 2;
@@ -6,6 +7,7 @@ export const excludeDatasetWithValueSumMin = 55;
 export const tooltipLableValueSep = ':';
 export const tooltipValueEndSufix = '%';
 export const graphXAsixMaxValue = 100;
+
 // export const toolTopSortOrder > default,asc,dec
 export interface CJChartDataSet {
   label: string;
@@ -25,7 +27,8 @@ export class ChartJSUtils {
     document: any,
     tooltipModel: any,
     toolTopSortOrder: string,
-    _: any
+    _: any,
+    showToolTip: boolean = true
   ) => {
     // Tooltip Element
     var tooltipEl = document.getElementById('chartjs-tooltip');
@@ -39,7 +42,14 @@ export class ChartJSUtils {
     }
 
     // Hide if no tooltip
+    let needtohide = false;
     if (tooltipModel.opacity === 0) {
+      needtohide = true;
+    }
+
+    // console.log(chartJsToolTipMouseOver);
+
+    if ((needtohide && !chartJsToolTipMouseOver) || !showToolTip) {
       tooltipEl.style.opacity = '0';
       return;
     }
@@ -126,6 +136,7 @@ export class ChartJSUtils {
       bodyData.forEach((item) => {
         innerHtml += item.html;
       });
+
       innerHtml += '</tbody>';
 
       var tableRoot = tooltipEl.querySelector('table');

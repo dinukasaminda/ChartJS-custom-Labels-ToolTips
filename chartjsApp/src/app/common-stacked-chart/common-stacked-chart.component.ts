@@ -43,7 +43,7 @@ export class CommonStackedChartComponent implements OnInit {
     let i = 0;
     this.datasets.forEach((dataset) => {
       var valueSum = dataset.data.reduce(function (a, b) {
-        console.log(b);
+        // console.log(b);
         return a + b;
       }, 0);
       if (excludeDatasetWithValueSumMin >= valueSum) {
@@ -101,7 +101,13 @@ export class CommonStackedChartComponent implements OnInit {
           enabled: false,
 
           custom: function (tooltipModel) {
-            ChartJSUtils.customToolTip(document, tooltipModel, 'dec', this);
+            ChartJSUtils.customToolTip(
+              document,
+              tooltipModel,
+              'dec',
+              this,
+              true
+            );
           },
         },
         plugins: {
