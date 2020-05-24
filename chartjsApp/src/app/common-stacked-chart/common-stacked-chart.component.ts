@@ -113,6 +113,7 @@ export class CommonStackedChartComponent implements OnInit {
         plugins: {
           datalabels: {
             color: '#000000',
+            anchor: 'center',
             formatter: function (value, ctx) {
               let str = '';
               if (withLables && lableShowValueMin <= value) {

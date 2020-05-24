@@ -45,13 +45,14 @@ export class CommonBarChartComponent implements OnInit {
       let colors = [];
       dataset.data.forEach((item, i) => {
         colors.push(this.color(ChartJSUtils.Colors[i]).alpha(0.8).rgbString());
+        console.log(ChartJSUtils.Colors[i]);
       });
 
       barChartData.datasets.push({
         label: dataset.label,
         backgroundColor: colors,
         borderColor: colors, // chartColors.red,
-        borderWidth: 1,
+        borderWidth: 2,
         data: dataset.data,
       });
 
@@ -67,6 +68,7 @@ export class CommonBarChartComponent implements OnInit {
       options: {
         responsive: true,
         legend: {
+          display: false,
           position: 'top',
         },
         title: {

@@ -160,13 +160,19 @@ export class ChartJSUtils {
       tooltipModel.yPadding + 'px ' + tooltipModel.xPadding + 'px';
   };
 
-  static Colors = [
+  static shuffleArray = (a) => {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  static Colors = ChartJSUtils.shuffleArray([
     '#FFCA28',
     '#C5CAE9',
     '#FF1744',
-    '#FFEBEE',
     '#FFCDD2',
-    '#EF9A9A',
+    // '#EF9A9A',
     '#E57373',
     '#EF5350',
     '#E53935',
@@ -399,7 +405,6 @@ export class ChartJSUtils {
     '#3E2723',
     '#FAFAFA',
     '#F5F5F5',
-    '#EEEEEE',
     '#E0E0E0',
     '#BDBDBD',
     '#9E9E9E',
@@ -417,6 +422,5 @@ export class ChartJSUtils {
     '#455A64',
     '#37474F',
     '#263238',
-    '#000000',
-  ];
+  ]);
 }
