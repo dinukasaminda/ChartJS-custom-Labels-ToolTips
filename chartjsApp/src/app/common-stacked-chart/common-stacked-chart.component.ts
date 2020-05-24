@@ -17,6 +17,8 @@ declare var ChartDataLabels;
   styleUrls: ['./common-stacked-chart.component.scss'],
 })
 export class CommonStackedChartComponent implements OnInit {
+  @Input() chartType: string = 'horizontalBar';
+
   @Input() chartId: string =
     'canvas' + Date.now() + '' + ChartJSUtils.randomNumber(100000);
   @Input() title: string = 'Chart.js Bar Chart';
@@ -66,7 +68,7 @@ export class CommonStackedChartComponent implements OnInit {
     let ctx: any = elmnt.getContext('2d');
     let myBar = new Chart(ctx, {
       plugins: [ChartDataLabels],
-      type: 'horizontalBar',
+      type: this.chartType,
       data: barChartData,
       options: {
         responsive: true,
